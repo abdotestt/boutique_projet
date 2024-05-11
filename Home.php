@@ -1,32 +1,39 @@
 <?php
+// $userFilePath = 'user_info.csv';
 
-// // Check if the form is submitted to generate the CSV file
-// if ($_SERVER["REQUEST_METHOD"] == "POST") {
-    
+// if (!file_exists($userFilePath)) {
+//     die("The user CSV file does not exist.");
 // }
 
+// // Read user information from CSV file
+// $userFile = fopen($userFilePath, 'r');
+// $userData = fgetcsv($userFile);
+// fclose($userFile);
+
+// // Extract the chosen category from user data
+// if (!empty($userData) && isset($userData[1])) {
+//     $selectedCategory = $userData[1];
+// } else {
+//     // Default category if user data is not available or incomplete
+//     $selectedCategory = 'default_category';
+// }
 // File path for the CSV file
 $filePath = 'products.csv';
-
 
 if (!file_exists($filePath)) {
     die("The CSV file does not exist.");
 }
 
-
 $file = fopen($filePath, 'r');
-
 
 $products = [];
 
 // Read the CSV file line by line
 while (($line = fgetcsv($file)) !== false) {
-   
     if ($line[1] == 'Product Name') {
         continue;
     }
 
-    
     $product = [
         'id' => $line[0], // Add ID field
         'productName' => $line[1], 
@@ -38,104 +45,114 @@ while (($line = fgetcsv($file)) !== false) {
         'taille' => $line[7] 
     ];
 
-    
     $products[] = $product;
 }
-
 
 fclose($file);
 
 if (isset($_GET['search'])) {
-    $searchQuery = strtolower($_GET['search']);
-    $filteredProducts = array_filter($products, function ($product) use ($searchQuery) {
-        return strpos(strtolower($product['productName']), $searchQuery) !== false;
-    });
+  $searchQuery = strtolower($_GET['search']);
+  $filteredProducts = array_filter($products, function ($product) use ($searchQuery) {
+      return strpos(strtolower($product['productName']), $searchQuery) !== false;
+  });
 } else {
-    $filteredProducts = $products;
-    
+  $filteredProducts = $products;
+  
 }
 
 if (isset($_GET['price-range'])) {
-    $priceRange = $_GET['price-range'];
-    if ($priceRange === '0-20') {
-        $filteredProducts = array_filter($filteredProducts, function ($product) {
-            return $product['price'] >= 0 && $product['price'] <= 20;
-        });
-    } elseif ($priceRange === '21-59') {
-        $filteredProducts = array_filter($filteredProducts, function ($product) {
-            return $product['price'] >= 21 && $product['price'] <= 59;
-        });
-    }
-    // Add more elseif conditions for other price ranges if needed
+  $priceRange = $_GET['price-range'];
+  if ($priceRange === '0-20') {
+      $filteredProducts = array_filter($filteredProducts, function ($product) {
+          return $product['price'] >= 0 && $product['price'] <= 20;
+      });
+  } elseif ($priceRange === '21-59') {
+      $filteredProducts = array_filter($filteredProducts, function ($product) {
+          return $product['price'] >= 21 && $product['price'] <= 59;
+      });
+  }
+  // Add more elseif conditions for other price ranges if needed
 }
 $products = $filteredProducts;
-
+if (isset($_GET['category'])) {
+    $selectedCategory = $_GET['category'];
+    $filteredProducts = array_filter($products, function ($product) use ($selectedCategory) {
+        return strtolower($product['category']) == strtolower($selectedCategory);
+    });
+    
+    // Update products array with filtered products
+    $products = $filteredProducts;
+}
 
 ?>
 
-<!DOCTYPE html>
-<html lang="en">
+
+
+
+<!doctype html>
+<html>
 <head>
-    <meta charset="UTF-8">
-    <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <script src="https://cdn.tailwindcss.com"></script>
-    <link href="https://cdn.jsdelivr.net/npm/tailwindcss@2.2.19/dist/tailwind.min.css" rel="stylesheet">
-    <title>Product Display</title>
-    <style>
-        .product {
-            border: 1px solid #ccc;
-            margin: 10px;
-            padding: 10px;
-            width: 200px;
-            float: left;
-        }
-        .product img {
-            width: 100%;
-            height: auto;
-        }
-        .add-to-cart-btn {
-            display: block;
-            width: 100%;
-            background-color: #4CAF50;
-            color: white;
-            padding: 14px 20px;
-            margin-top: 10px;
-            border: none;
-            border-radius: 4px;
-            cursor: pointer;
-            text-align: center;
-            text-decoration: none;
-        }
-        .add-to-cart-btn:hover {
-            background-color: #45a049;
-        }
-    </style>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <script src="https://cdn.tailwindcss.com"></script>
+  <link href="https://cdn.jsdelivr.net/npm/tailwindcss@2.2.19/dist/tailwind.min.css" rel="stylesheet">
+  <link rel="stylesheet" href="Style.CSS">
 </head>
 <body>
 
-<div class="search-container flex justify-center items-center mt-8">
-    <form action="" method="GET" class="flex">
-        <input type="text" name="search" placeholder="Search products..." value="<?php echo isset($_GET['search']) ? htmlspecialchars($_GET['search']) : ''; ?>" class="px-4 py-2 border border-gray-300 rounded-l-md focus:outline-none focus:border-blue-500">
-        <select name="price-range" class="px-4 py-2 border border-gray-300 rounded-none focus:outline-none focus:border-blue-500">
-            <option value="">Select Price Range</option>
-            <option value="0-20">0 to 20</option>
-            <option value="21-59">21 to 59</option>
-            <!-- Add more options for other price ranges if needed -->
-        </select>
-        <button type="submit" class="px-4 py-2 bg-blue-500 text-white rounded-r-md hover:bg-blue-600 focus:outline-none focus:bg-blue-600">Search</button>
-    </form>
+<div class="flex flex-col lg:flex-row justify-between items-center">
+    <!-- Menu -->
+    <ul class="menu flex flex-wrap lg:flex-nowrap ">
+        <li><a href="?category=Dresses" class="catg">Women's Dresses</a></li>
+        <li><a href="?category=Jeans" class="catg">Men's Jeans</a></li>
+        <li><a href="?category=T-Shirts" class="catg">Women's T-Shirts</a></li>
+        <li><a href="?category=Jackets" class="catg">Men's Jackets</a></li>
+        <li><a href="?category=Shoes" class="catg">Women's Shoes</a></li>
+        <li><a href="?category=Shirts" class="catg">Men's Shirts</a></li>
+    </ul>
+    <!-- Search Form -->
+    <div class="search-container flex items-center mt-4 lg:mt-0">
+        <form action="" method="GET" class="flex">
+            <input type="text" name="search" placeholder="Search products..." value="<?php echo isset($_GET['search']) ? htmlspecialchars($_GET['search']) : ''; ?>" class="px-4 py-2 border border-gray-300 rounded-l-md focus:outline-none focus:border-blue-500">
+            <select name="price-range" class="px-4 py-2 border border-gray-300 rounded-none focus:outline-none focus:border-blue-500">
+                <option value="">Select Price Range</option>
+                <option value="0-20">0 to 20</option>
+                <option value="21-59">21 to 59</option>
+                <!-- Add more options for other price ranges if needed -->
+            </select>
+            <button type="submit" class="px-4 py-2 bg-blue-500 text-white rounded-r-md hover:bg-blue-600 focus:outline-none focus:bg-blue-600">Search</button>
+        </form>
+    </div>
 </div>
 
 
 
-<!-- <form method="post">
-    <button type="submit">Generate CSV File</button>
-</form> -->
+    
+    <div class="relative overflow-hidden bg-cover bg-no-repeat" style="
+        background-position: 50%;
+        background-image: url('https://encrypted-tbn0.gstatic.com/images?q=tbn:ANd9GcQLhDXi0ODWew9cJx6qaY6RA2Zh_2S_Of7BYHw1tbvU8Q&s');
+        height: 500px;
+      ">
+    <div class="absolute top-0 right-0 bottom-0 left-0 h-full w-full overflow-hidden bg-[hsla(0,0%,0%,0.75)] bg-fixed">
+      <div class="flex h-full items-center justify-center">
+        <div class="px-6 text-center text-white md:px-12">
+          <h1 class="mt-2 mb-16 text-5xl font-bold tracking-tight md:text-6xl xl:text-7xl">
+            The best offer on the market <br /><span>for your business</span>
+          </h1>
+          <a href="index.php"><button type="button" class="rounded border-2 border-neutral-50 px-[46px] pt-[14px] pb-[12px] text-sm font-medium uppercase leading-normal text-neutral-50 transition duration-150 ease-in-out hover:border-neutral-100 hover:bg-neutral-100 hover:bg-opacity-10 hover:text-neutral-100 focus:border-neutral-100 focus:text-neutral-100 focus:outline-none focus:ring-0 active:border-neutral-200 active:text-neutral-200" data-te-ripple-init data-te-ripple-color="light">
+            Get started
+          </button>
+          </a>
+        </div>
+      </div>
+    </div>
+  </div>
 
+<Script src="SCR5IPT.JS"></Script>
 
 <div class="bg-white">
   <div class="mx-auto max-w-2xl px-4 py-16 sm:px-6 sm:py-24 lg:max-w-7xl lg:px-8">
-    <h2 class="text-2xl font-bold tracking-tight text-gray-900">All Products</h2>
+    <h2 class="text-2xl font-bold tracking-tight text-gray-900">Products</h2>
 
     <div class="mt-6 grid grid-cols-1 gap-x-6 gap-y-10 sm:grid-cols-2 lg:grid-cols-4 xl:gap-x-8">
     <?php foreach ($products as $product): ?>
@@ -158,21 +175,85 @@ $products = $filteredProducts;
 
           <p class="text-sm font-medium text-gray-900">Price: $<?php echo $product['price']; ?></p>
         </div>
-        <form action="cart.php" method="POST">
-                <button class="add-to-cart-btn" type="submit">Add to Cart</button>
-            </form>
       </div>
       <?php endforeach; ?>
     </div>
   </div>
 </div>
+<!-- Category section -->
+
+
+
 <footer
   class="bg-zinc-50 text-center text-surface/75 dark:bg-neutral-700 dark:text-white/75 lg:text-left">
   <div
     class="flex items-center justify-center border-b-2 border-neutral-200 p-6 dark:border-white/10 lg:justify-between">
   
     <!-- Social network icons container -->
-    <div class="flex justify-center">
+   
+
+  <!-- Main container div: holds the entire content of the footer, including four sections (TW Elements, Products, Useful links, and Contact), with responsive styling and appropriate padding/margins. -->
+  <div class="mx-6 py-10 text-center md:text-left">
+    
+    <div class="grid-1 grid gap-8 md:grid-cols-2 lg:grid-cols-4">
+      <!-- TW Elements section -->
+      <div class="">
+        <h6
+          class="mb-4 flex items-center justify-center font-semibold uppercase md:justify-start">
+          <span class="me-3 [&>svg]:h-4 [&>svg]:w-4">
+            <svg
+              xmlns="http://www.w3.org/2000/svg"
+              viewBox="0 0 24 24"
+              fill="currentColor">
+              <path
+                d="M12.378 1.602a.75.75 0 00-.756 0L3 6.632l9 5.25 9-5.25-8.622-5.03zM21.75 7.93l-9 5.25v9l8.628-5.032a.75.75 0 00.372-.648V7.93zM11.25 22.18v-9l-9-5.25v8.57a.75.75 0 00.372.648l8.628 5.033z" />
+            </svg>
+          </span>
+          NEXTON
+        </h6>
+        <p>
+          Here you can use rows and columns to organize your footer
+          content. Lorem ipsum dolor sit amet, consectetur adipisicing
+          elit.
+        </p>
+      </div>
+      <!-- Products section -->
+      <div>
+        <h6
+          class="mb-4 flex justify-center font-semibold uppercase md:justify-start">
+          Quick Link
+        </h6>
+        <p class="mb-4">
+          <a href="#!">Home</a>
+        </p>
+        <p class="mb-4">
+          <a href="#!">Product</a>
+        </p>
+        <p class="mb-4">
+          <a href="#!">card</a>
+        </p>
+        
+      </div>
+      <!-- Useful links section -->
+      <div>
+        <h6
+          class="mb-4 flex justify-center font-semibold uppercase md:justify-start">
+          Category
+        </h6>
+        <p class="mb-4">
+          <a href="#!">Shirt</a>
+        </p>
+        <p class="mb-4">
+          <a href="#!">Shoes</a>
+        </p>
+        <p class="mb-4">
+          <a href="#!">T-shirt</a>
+        </p>
+        <p>
+          <a href="#!">Jeans</a>
+        </p>
+      </div>
+      <div class="flex justify-center">
       <a href="#!" class="me-6 [&>svg]:h-4 [&>svg]:w-4">
         <svg
           xmlns="http://www.w3.org/2000/svg"
@@ -235,68 +316,6 @@ $products = $filteredProducts;
       </a>
     </div>
   </div>
-
-  <!-- Main container div: holds the entire content of the footer, including four sections (TW Elements, Products, Useful links, and Contact), with responsive styling and appropriate padding/margins. -->
-  <div class="mx-6 py-10 text-center md:text-left">
-    <div class="grid-1 grid gap-8 md:grid-cols-2 lg:grid-cols-4">
-      <!-- TW Elements section -->
-      <div class="">
-        <h6
-          class="mb-4 flex items-center justify-center font-semibold uppercase md:justify-start">
-          <span class="me-3 [&>svg]:h-4 [&>svg]:w-4">
-            <svg
-              xmlns="http://www.w3.org/2000/svg"
-              viewBox="0 0 24 24"
-              fill="currentColor">
-              <path
-                d="M12.378 1.602a.75.75 0 00-.756 0L3 6.632l9 5.25 9-5.25-8.622-5.03zM21.75 7.93l-9 5.25v9l8.628-5.032a.75.75 0 00.372-.648V7.93zM11.25 22.18v-9l-9-5.25v8.57a.75.75 0 00.372.648l8.628 5.033z" />
-            </svg>
-          </span>
-          NEXTON
-        </h6>
-        <p>
-          Here you can use rows and columns to organize your footer
-          content. Lorem ipsum dolor sit amet, consectetur adipisicing
-          elit.
-        </p>
-      </div>
-      <!-- Products section -->
-      <div>
-        <h6
-          class="mb-4 flex justify-center font-semibold uppercase md:justify-start">
-          Quick Link
-        </h6>
-        <p class="mb-4">
-          <a href="#!">Home</a>
-        </p>
-        <p class="mb-4">
-          <a href="#!">Product</a>
-        </p>
-        <p class="mb-4">
-          <a href="#!">card</a>
-        </p>
-        
-      </div>
-      <!-- Useful links section -->
-      <div>
-        <h6
-          class="mb-4 flex justify-center font-semibold uppercase md:justify-start">
-          Category
-        </h6>
-        <p class="mb-4">
-          <a href="#!">Shirt</a>
-        </p>
-        <p class="mb-4">
-          <a href="#!">Shoes</a>
-        </p>
-        <p class="mb-4">
-          <a href="#!">T-shirt</a>
-        </p>
-        <p>
-          <a href="#!">Jeans</a>
-        </p>
-      </div>
-      
       
     </div>
   </div>
@@ -310,5 +329,9 @@ $products = $filteredProducts;
   </div>
 </footer>
 
+
 </body>
-</html>
+</html> 
+ 
+
+
