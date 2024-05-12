@@ -112,7 +112,11 @@ $products = $filteredProducts;
     </style>
 </head>
 <body>
-
+<?php
+    session_start();
+    require('middleware.php');
+    require 'nav.php';
+  ?>
 <div class="search-container flex justify-center items-center mt-8">
     <form action="" method="GET" class="flex">
         <input type="text" name="search" placeholder="Search products..." value="<?php echo isset($_GET['search']) ? htmlspecialchars($_GET['search']) : ''; ?>" class="px-4 py-2 border border-gray-300 rounded-l-md focus:outline-none focus:border-blue-500">

@@ -1,23 +1,5 @@
 <?php
-// $userFilePath = 'user_info.csv';
 
-// if (!file_exists($userFilePath)) {
-//     die("The user CSV file does not exist.");
-// }
-
-// // Read user information from CSV file
-// $userFile = fopen($userFilePath, 'r');
-// $userData = fgetcsv($userFile);
-// fclose($userFile);
-
-// // Extract the chosen category from user data
-// if (!empty($userData) && isset($userData[1])) {
-//     $selectedCategory = $userData[1];
-// } else {
-//     // Default category if user data is not available or incomplete
-//     $selectedCategory = 'default_category';
-// }
-// File path for the CSV file
 $filePath = 'products.csv';
 
 if (!file_exists($filePath)) {
@@ -99,7 +81,11 @@ if (isset($_GET['category'])) {
   <link rel="stylesheet" href="Style.CSS">
 </head>
 <body>
-
+<?php
+    session_start();
+    require('middleware.php');
+    require 'nav.php';
+  ?>
 <div class="flex flex-col lg:flex-row justify-between items-center">
     <!-- Menu -->
     <ul class="menu flex flex-wrap lg:flex-nowrap ">
@@ -137,10 +123,10 @@ if (isset($_GET['category'])) {
       <div class="flex h-full items-center justify-center">
         <div class="px-6 text-center text-white md:px-12">
           <h1 class="mt-2 mb-16 text-5xl font-bold tracking-tight md:text-6xl xl:text-7xl">
-            The best offer on the market <br /><span>for your business</span>
+            The best offer on the market <br /><span>for you !</span>
           </h1>
-          <a href="index.php"><button type="button" class="rounded border-2 border-neutral-50 px-[46px] pt-[14px] pb-[12px] text-sm font-medium uppercase leading-normal text-neutral-50 transition duration-150 ease-in-out hover:border-neutral-100 hover:bg-neutral-100 hover:bg-opacity-10 hover:text-neutral-100 focus:border-neutral-100 focus:text-neutral-100 focus:outline-none focus:ring-0 active:border-neutral-200 active:text-neutral-200" data-te-ripple-init data-te-ripple-color="light">
-            Get started
+          <a href="products.php"><button type="button" class="rounded border-2 border-neutral-50 px-[46px] pt-[14px] pb-[12px] text-sm font-medium uppercase leading-normal text-neutral-50 transition duration-150 ease-in-out hover:border-neutral-100 hover:bg-neutral-100 hover:bg-opacity-10 hover:text-neutral-100 focus:border-neutral-100 focus:text-neutral-100 focus:outline-none focus:ring-0 active:border-neutral-200 active:text-neutral-200" data-te-ripple-init data-te-ripple-color="light">
+            Buy your best clothes Now !
           </button>
           </a>
         </div>

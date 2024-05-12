@@ -1,19 +1,3 @@
-<!DOCTYPE html>
-<html lang="en">
-<head>
-    <meta charset="UTF-8">
-    <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <script src="https://cdn.tailwindcss.com"></script>
-
-    <title>Home</title>
-</head>
-<body>
-
-
-  <?php
-    session_start();
-    require('middleware.php');
-  ?>
 
 
 <header class="bg-white">
@@ -21,7 +5,7 @@
     <div class="flex lg:flex-1">
       <a href="#" class="-m-1.5 p-1.5">
         <span class="sr-only">Your Company</span>
-        <img class="h-8 w-auto" src="https://tailwindui.com/img/logos/mark.svg?color=indigo&shade=600" alt="">
+        <img class="" src="lg.jpg" height="100px" width="100px" alt="Your Company">
       </a>
     </div>
     <div class="flex lg:hidden">
@@ -207,5 +191,4 @@
     </div>
   </div>
 </header>
-</body>
-</html>
+

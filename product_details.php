@@ -115,6 +115,11 @@ fclose($file);
     </style>
 </head>
 <body>
+<?php
+    session_start();
+    require('middleware.php');
+    require 'nav.php';
+  ?>
     <div class="container">
         <div class="product-details">
             <div class="product-image">
@@ -128,7 +133,12 @@ fclose($file);
                 <p><strong>Color:</strong> <?php echo $productDetails['color']; ?></p>
                 <p><strong>Taille:</strong> <?php echo $productDetails['taille']; ?></p>
                 <!-- You can add more details or actions here -->
-                <button class="add-to-cart-btn" type="submit">Add to Cart</button>
+                <form action="cart.php" method="POST" >
+                <input type="hidden" name="productId" value="<?php echo $productDetails['id']; ?>">
+                    <button class="add-to-cart-btn" id="ToggleButton" >
+                        Add to Cart
+                    </button>
+                </form>
             </div>
         </div>
     </div>

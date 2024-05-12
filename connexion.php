@@ -31,7 +31,7 @@ if ($utilisateurTrouve !== NULL) {
     $_SESSION['email'] =  $utilisateurTrouve[0];
     $_SESSION['name'] =  $utilisateurTrouve[2];
     $_SESSION['categories'] =  $utilisateurTrouve[3];
-    $newURL = "index.php";
+    $newURL = "home.php";
     header('Location: '.$newURL);
     echo "Utilisateur trouvé : " . $utilisateurTrouve[0];
 } else {
